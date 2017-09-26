@@ -1,0 +1,141 @@
+<DOCTYPE !html>
+<html>
+<head>
+    <title>Realmeye API Test</title>
+    <style>
+        body {
+            background-color: #111;
+            color: #fff;
+            font-family: calibri;
+        }
+
+        input {
+            width: 305px;
+            padding: 5px;
+            background-color: #444;
+            color: #fff;
+            border: solid 1px #2496ff;
+        }
+
+        select {
+            width: 150px;
+            padding: 4px;
+            background-color: #444;
+            color: #fff;
+            border: solid 1px #2496ff;
+        }
+
+        textarea {
+            width: 1000px;
+            padding: 5px;
+            background-color: #444;
+            color: #fff;
+            border: solid 1px #2496ff;
+            height: 600px;
+        }
+
+        a {
+            color: #2496ff;
+            font-weight: bold;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+This is a new project. Search tools will increase as development progresses.
+
+<br><br><strong>Player Lookup</strong>
+<br><input type="text" name="realmeyePlayer"> <a href="#" data-target="replayer">Search Player</a>
+
+<br><br><strong>Top Characters by Class</strong>
+<br>
+<select name="realmeyeClass">
+    <option>Archer</option>
+    <option>Assassin</option>
+    <option>Huntress</option>
+    <option>Knight</option>
+    <option>Mystic</option>
+    <option>Necromancer</option>
+    <option>Ninja</option>
+    <option>Paladin</option>
+    <option>Priest</option>
+    <option>Rogue</option>
+    <option>Sorcerer</option>
+    <option>Trickster</option>
+    <option>Warrior</option>
+    <option>Wizard</option>
+</select>
+<select name="realmeyeClassPage">
+    <option value="0">0-100</option>
+    <option value="1">101-200</option>
+    <option value="2">201-300</option>
+    <option value="3">301-400</option>
+    <option value="4">401-500</option>
+    <option value="5">501-600</option>
+    <option value="6">601-700</option>
+    <option value="7">701-800</option>
+    <option value="8">801-900</option>
+    <option value="9">901-1000</option>
+</select>
+<a href="#" data-target="reclass">Search Class</a>
+
+<br><br><strong>Results</strong>
+<br><textarea></textarea>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" language="javascript"></script>
+<script src="lib/realmeye-api.js" language="javascript"></script>
+<script language="JavaScript">
+
+    function react(e, target) {
+
+        if ( e ) e.preventDefault();
+        if ( target === 'reclass' ) {
+
+            var $class = $('select[name="realmeyeClass"]').val();
+            var page = $('select[name="realmeyeClassPage"]').val();
+            if ( $class.length > 0 ) {
+
+                realmeyeapi.get.list('class', $class, page, function (result) {
+
+                    var string = JSON.stringify(result, null, 5);
+                    $('textarea').val(string);
+
+                });
+
+            } else $('textarea').val('Invalid player name provided');
+
+        } else if ( target === 'replayer' ) {
+
+            var ign = $('input[name="realmeyePlayer"]').val();
+            if ( ign.length > 0 ) {
+
+                realmeyeapi.get.player(ign, function (result) {
+
+                    var string = JSON.stringify(result, null, 5);
+                    $('textarea').val(string);
+
+                });
+
+            } else $('textarea').val('Invalid player name provided');
+
+        }
+
+
+
+    }
+
+    $('a').click(function(e) { react(e, $(this).attr('data-target')); });
+    $('input, select').keyup(function(e) {
+        var target = '';
+        if ( $(this).attr('name') === 'realmeyePlayer' ) target = 'replayer';
+        if ( $(this).attr('name') === 'realmeyeClass' ) target = 'reclass';
+        if ( e.keyCode == 13 ) react(null, target);
+    });
+
+</script>
+
+</body>
+</html>
+</DOCTYPE>
