@@ -46,7 +46,7 @@
 
 This is a new project. Search tools will increase as development progresses.
     
-<br><br>See <a href="https://jakcodex.github.io/realmeye-api/REQUIREMENTS">Requirements</a> before you get started.
+<br><br>See <a href="https://jakcodex.github.io/realmeye-api/REQUIREMENTS" class="ignore">Requirements</a> before you get started.
 
 <br><br><strong>Player Lookup</strong>
 <br><input type="text" name="realmeyePlayer"> <a href="#" data-target="replayer">Search Player</a>
@@ -128,7 +128,7 @@ This is a new project. Search tools will increase as development progresses.
 
     }
 
-    $('a').click(function(e) { react(e, $(this).attr('data-target')); });
+    $('a:not(.ignore)').click(function(e) { react(e, $(this).attr('data-target')); });
     $('input, select').keyup(function(e) {
         var target = '';
         if ( $(this).attr('name') === 'realmeyePlayer' ) target = 'replayer';
