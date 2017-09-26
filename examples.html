@@ -26,12 +26,20 @@
         }
 
         textarea {
-            width: 1000px;
             padding: 5px;
             background-color: #444;
             color: #fff;
             border: solid 1px #2496ff;
+        }
+
+        textarea#results {
+            width: 1000px;
             height: 600px;
+        }
+
+        textarea#code {
+            width: 800px;
+            height: 200px;
         }
 
         a {
@@ -46,7 +54,9 @@
 
 This is a new project. Search tools will increase as development progresses.
     
-<br><br>See <a href="https://jakcodex.github.io/realmeye-api/REQUIREMENTS" class="ignore">Requirements</a> before you get started.
+<br><br>See <a href="https://jakcodex.github.io/realmeye-api/REQUIREMENTS" class="ignore" target="_blank">Requirements</a> before you get started.
+
+<br><br>Source code is available on <a href="https://github.com/jakcodex/realmeye-api" class="ignore" target="_blank">Github</a>.
 
 <br><br><strong>Player Lookup</strong>
 <br><input type="text" name="realmeyePlayer"> <a href="#" data-target="replayer">Search Player</a>
@@ -82,9 +92,18 @@ This is a new project. Search tools will increase as development progresses.
     <option value="9">901-1000</option>
 </select>
 <a href="#" data-target="reclass">Search Class</a>
+<br><br>
+<div>
+    <div style="float: left; margin-top: 10px; margin-right: 10px;">
+        <strong>Results</strong>
+        <br><textarea id="results" spellcheck="false"></textarea>
+    </div>
 
-<br><br><strong>Results</strong>
-<br><textarea></textarea>
+    <div style="float: left; margin-top: 10px; margin-right: 10px;">
+        <strong>Code</strong>
+        <br><textarea id="code" spellcheck="false"></textarea>
+    </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js" language="javascript"></script>
 <script src="lib/realmeye-api.js" language="javascript"></script>
@@ -99,10 +118,11 @@ This is a new project. Search tools will increase as development progresses.
             var page = $('select[name="realmeyeClassPage"]').val();
             if ( $class.length > 0 ) {
 
+                $('textarea#code').val('realmeyeapi.get.list(\'class\', \'' + $class + '\', ' + page + ', function(result) { \n\t//  your code here \n});');
                 realmeyeapi.get.list('class', $class, page, function (result) {
 
                     var string = JSON.stringify(result, null, 5);
-                    $('textarea').val(string);
+                    $('textarea#results').val(string);
 
                 });
 
@@ -111,12 +131,13 @@ This is a new project. Search tools will increase as development progresses.
         } else if ( target === 'replayer' ) {
 
             var ign = $('input[name="realmeyePlayer"]').val();
+            $('textarea#code').val('realmeyeapi.get.player(\'' + ign + '\', function(result) { \n\t//  your code here \n});');
             if ( ign.length > 0 ) {
 
                 realmeyeapi.get.player(ign, function (result) {
 
                     var string = JSON.stringify(result, null, 5);
-                    $('textarea').val(string);
+                    $('textarea#results').val(string);
 
                 });
 
