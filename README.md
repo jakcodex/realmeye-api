@@ -3,6 +3,10 @@ Javascript API for Realmeye
 
 Uses JQuery to parse Realmeye pages and return data.
 
+## Requirements
+
+See [Requirements](REQUIREMENTS.md) before proceeding to the examples.
+
 ## Current Features
 
 - Player summary and character lookup
