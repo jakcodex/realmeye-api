@@ -38,7 +38,7 @@
         }
 
         textarea#code {
-            width: 800px;
+            width: 600px;
             height: 200px;
         }
 
@@ -92,6 +92,44 @@ This is a new project. Search tools will increase as development progresses.
     <option value="9">901-1000</option>
 </select>
 <a href="#" data-target="reclass">Search Class</a>
+
+<br><br><strong>Most Recent Deaths</strong>
+<br>
+<select name="realmeyeRecentDeathsMS">
+    <option value="0">Maxed Stats</option>
+    <option value="0">0</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+</select>
+<select name="realmeyeRecentDeathsBF">
+    <option value="0">Base Fame</option>
+    <option value="0">0</option>
+    <option value="20">20</option>
+    <option value="150">150</option>
+    <option value="400">400</option>
+    <option value="800">800</option>
+    <option value="2000">2000</option>
+</select>
+<select name="realmeyeRecentDeathsPage">
+    <option value="0">0-100</option>
+    <option value="1">101-200</option>
+    <option value="2">201-300</option>
+    <option value="3">301-400</option>
+    <option value="4">401-500</option>
+    <option value="5">501-600</option>
+    <option value="6">601-700</option>
+    <option value="7">701-800</option>
+    <option value="8">801-900</option>
+    <option value="9">901-1000</option>
+</select>
+<a href="#" data-target="rerecentdeaths">Search Recent Deaths</a>
+
 <br><br>
 <div>
     <div style="float: left; margin-top: 10px; margin-right: 10px;">
@@ -112,10 +150,35 @@ This is a new project. Search tools will increase as development progresses.
     function react(e, target) {
 
         if ( e ) e.preventDefault();
-        if ( target === 'reclass' ) {
+        var page = 0;
+        if ( target === 'rerecentdeaths' ) {
+
+            var options = {
+                bf: Number($('select[name="realmeyeRecentDeathsBF"]').val()),
+                ms: Number($('select[name="realmeyeRecentDeathsMS"]').val())
+            };
+
+            page = $('select[name="realmeyeRecentDeathsPage"]').val();
+
+            //  don't include them if they are 0
+            for ( var i in options )
+                if ( options.hasOwnProperty(i) )
+                    if ( options[i] === 0 )
+                        delete options[i];
+
+            $('textarea#code').val('realmeyeapi.get.list(\'recentdeaths\', ' + JSON.stringify(options) + ', ' + page + ', function(result) { \n\t//  your code here \n});');
+
+            realmeyeapi.get.list('recentdeaths', options, page, function (result) {
+
+                var string = JSON.stringify(result, null, 5);
+                $('textarea#results').val(string);
+
+            });
+
+        } else if ( target === 'reclass' ) {
 
             var $class = $('select[name="realmeyeClass"]').val();
-            var page = $('select[name="realmeyeClassPage"]').val();
+            page = $('select[name="realmeyeClassPage"]').val();
             if ( $class.length > 0 ) {
 
                 $('textarea#code').val('realmeyeapi.get.list(\'class\', \'' + $class + '\', ' + page + ', function(result) { \n\t//  your code here \n});');
@@ -126,7 +189,7 @@ This is a new project. Search tools will increase as development progresses.
 
                 });
 
-            } else $('textarea').val('Invalid player name provided');
+            } else $('textarea#results').val('Invalid player name provided');
 
         } else if ( target === 'replayer' ) {
 
@@ -141,7 +204,7 @@ This is a new project. Search tools will increase as development progresses.
 
                 });
 
-            } else $('textarea').val('Invalid player name provided');
+            } else $('textarea#results').val('Invalid player name provided');
 
         }
 
