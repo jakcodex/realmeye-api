@@ -9,7 +9,7 @@
             font-family: calibri;
         }
 
-        input {
+        input:not(.nostyle) {
             width: 305px;
             padding: 5px;
             background-color: #444;
@@ -57,6 +57,11 @@ This is a new project. Search tools will increase as development progresses.
 <br><br>See <a href="https://jakcodex.github.io/realmeye-api/REQUIREMENTS" class="ignore" target="_blank">Requirements</a> before you get started.
 
 <br><br>Source code is available on <a href="https://github.com/jakcodex/realmeye-api" class="ignore" target="_blank">Github</a>.
+
+<br><br><strong>Global Options</strong>
+
+<br><input type="checkbox" name="realmeyeCondensed" class="nostyle"> Condensed output
+<br><input type="checkbox" name="realmeyeNoPrivate" class="nostyle"> No private accounts
 
 <br><br><strong>Player Lookup</strong>
 <br><input type="text" name="realmeyePlayer"> <a href="#" data-target="replayer">Search Player</a>
@@ -128,12 +133,17 @@ This is a new project. Search tools will increase as development progresses.
     <option value="8">801-900</option>
     <option value="9">901-1000</option>
 </select>
+<select name="realmeyeRecentDeathsBonuses">
+    <option value="0">Bonuses</option>
+    <option value="0">No</option>
+    <option value="1">Yes</option>
+</select>
 <a href="#" data-target="rerecentdeaths">Search Recent Deaths</a>
 
 <br><br>
 <div>
     <div style="float: left; margin-top: 10px; margin-right: 10px;">
-        <strong>Results</strong>
+        <strong>Result</strong>
         <br><textarea id="results" spellcheck="false"></textarea>
     </div>
 
@@ -143,7 +153,7 @@ This is a new project. Search tools will increase as development progresses.
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js" language="javascript"></script>
+<script src="vendor/jquery-3.2.1.min.js" language="javascript"></script>
 <script src="lib/realmeye-api.js" language="javascript"></script>
 <script language="JavaScript">
 
@@ -151,9 +161,16 @@ This is a new project. Search tools will increase as development progresses.
 
         if ( e ) e.preventDefault();
         var page = 0;
+        var condensed = $('input[name="realmeyeCondensed"]').prop('checked');
+        var noPrivate = $('input[name="realmeyeNoPrivate"]').prop('checked');
         if ( target === 'rerecentdeaths' ) {
 
-            var options = {
+            var args = {
+                condensed: condensed,
+                noPrivate: noPrivate,
+                bonuses: ( $('select[name="realmeyeRecentDeathsBonuses"]').val() === "1" )
+            };
+            args.options = {
                 bf: Number($('select[name="realmeyeRecentDeathsBF"]').val()),
                 ms: Number($('select[name="realmeyeRecentDeathsMS"]').val())
             };
@@ -161,14 +178,22 @@ This is a new project. Search tools will increase as development progresses.
             page = $('select[name="realmeyeRecentDeathsPage"]').val();
 
             //  don't include them if they are 0
-            for ( var i in options )
-                if ( options.hasOwnProperty(i) )
-                    if ( options[i] === 0 )
-                        delete options[i];
+            for ( var i in args.options )
+                if ( args.options.hasOwnProperty(i) )
+                    if ( args.options[i] === 0 )
+                        delete args.options[i];
 
-            $('textarea#code').val('realmeyeapi.get.list(\'recentdeaths\', ' + JSON.stringify(options) + ', ' + page + ', function(result) { \n\t//  your code here \n});');
+            if ( Object.keys(args.options).length === 0 ) delete args.options;
 
-            realmeyeapi.get.list('recentdeaths', options, page, function (result) {
+            var SampleArgs = $.extend(true, {}, args);
+            if ( condensed === false ) delete SampleArgs.condensed;
+            if ( noPrivate === false ) delete SampleArgs.noPrivate;
+            if ( args.bonuses === false ) delete SampleArgs.bonuses;
+            if ( typeof SampleArgs === 'object' ) SampleArgs = JSON.stringify(SampleArgs, null, 4);
+
+            $('textarea#code').val('realmeyeapi.get.list(\'recentdeaths\', ' + SampleArgs + ', ' + page + ', function(result) { \n\t//  your code here \n});');
+
+            realmeyeapi.get.list('recentdeaths', args, page, function (result) {
 
                 var string = JSON.stringify(result, null, 5);
                 $('textarea#results').val(string);
@@ -181,8 +206,14 @@ This is a new project. Search tools will increase as development progresses.
             page = $('select[name="realmeyeClassPage"]').val();
             if ( $class.length > 0 ) {
 
-                $('textarea#code').val('realmeyeapi.get.list(\'class\', \'' + $class + '\', ' + page + ', function(result) { \n\t//  your code here \n});');
-                realmeyeapi.get.list('class', $class, page, function (result) {
+                var args = {class: $class, condensed: condensed, noPrivate: noPrivate};
+                var SampleArgs = $.extend(true, {}, args);
+                if ( condensed === false ) delete SampleArgs.condensed;
+                if ( noPrivate === false ) delete SampleArgs.noPrivate;
+                if ( Object.keys(SampleArgs).length === 1 ) SampleArgs = '\'' + SampleArgs.class + '\'';
+                if ( typeof SampleArgs === 'object' ) SampleArgs = JSON.stringify(SampleArgs, null, 4);
+                $('textarea#code').val('realmeyeapi.get.list(\'class\', ' + SampleArgs + ', ' + page + ', function(result) { \n\t//  your code here \n});');
+                realmeyeapi.get.list('class', args, page, function (result) {
 
                     var string = JSON.stringify(result, null, 5);
                     $('textarea#results').val(string);
@@ -194,10 +225,11 @@ This is a new project. Search tools will increase as development progresses.
         } else if ( target === 'replayer' ) {
 
             var ign = $('input[name="realmeyePlayer"]').val();
-            $('textarea#code').val('realmeyeapi.get.player(\'' + ign + '\', function(result) { \n\t//  your code here \n});');
+            var SampleArgs = ( condensed === true ) ? '{condensed: ' + condensed + '}, ' : '';
+            $('textarea#code').val('realmeyeapi.get.player(\'' + ign + '\', ' + SampleArgs + 'function(result) { \n\t//  your code here \n});');
             if ( ign.length > 0 ) {
 
-                realmeyeapi.get.player(ign, function (result) {
+                realmeyeapi.get.player(ign, {condensed: condensed}, function (result) {
 
                     var string = JSON.stringify(result, null, 5);
                     $('textarea#results').val(string);
@@ -220,6 +252,16 @@ This is a new project. Search tools will increase as development progresses.
         if ( e.keyCode == 13 ) react(null, target);
     });
 
+</script>
+
+<!-- never any ads, but I would like to know about activity -->
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107176264-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments)}
+    gtag('js', new Date());
+    gtag('config', 'UA-107176264-1');
 </script>
 
 </body>
