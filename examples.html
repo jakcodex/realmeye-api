@@ -52,6 +52,8 @@
 </head>
 <body>
 
+<h2>The examples have not been updated to support the latest version of 0.1. Soon!</h2>
+
 This is a new project. Search tools will increase as development progresses.
     
 <br><br>See <a href="https://jakcodex.github.io/realmeye-api/REQUIREMENTS" class="ignore" target="_blank">Requirements</a> before you get started.
@@ -154,7 +156,7 @@ This is a new project. Search tools will increase as development progresses.
 </div>
 
 <script src="vendor/jquery-3.2.1.min.js" language="javascript"></script>
-<script src="lib/realmeye-api.js" language="javascript"></script>
+<script src="lib/realmeye-api.browser.js" language="javascript"></script>
 <script language="JavaScript">
 
     function react(e, target) {
@@ -193,7 +195,7 @@ This is a new project. Search tools will increase as development progresses.
 
             $('textarea#code').val('realmeyeapi.get.list(\'recentdeaths\', ' + SampleArgs + ', ' + page + ', function(result) { \n\t//  your code here \n});');
 
-            realmeyeapi.get.list('recentdeaths', args, page, function (result) {
+            realmeyeApiBrowser.get.list('recentdeaths', args, page, function (result) {
 
                 var string = JSON.stringify(result, null, 5);
                 $('textarea#results').val(string);
@@ -213,7 +215,7 @@ This is a new project. Search tools will increase as development progresses.
                 if ( Object.keys(SampleArgs).length === 1 ) SampleArgs = '\'' + SampleArgs.class + '\'';
                 if ( typeof SampleArgs === 'object' ) SampleArgs = JSON.stringify(SampleArgs, null, 4);
                 $('textarea#code').val('realmeyeapi.get.list(\'class\', ' + SampleArgs + ', ' + page + ', function(result) { \n\t//  your code here \n});');
-                realmeyeapi.get.list('class', args, page, function (result) {
+                realmeyeApiBrowser.get.list('class', args, page, function (result) {
 
                     var string = JSON.stringify(result, null, 5);
                     $('textarea#results').val(string);
@@ -229,7 +231,7 @@ This is a new project. Search tools will increase as development progresses.
             $('textarea#code').val('realmeyeapi.get.player(\'' + ign + '\', ' + SampleArgs + 'function(result) { \n\t//  your code here \n});');
             if ( ign.length > 0 ) {
 
-                realmeyeapi.get.player(ign, {condensed: condensed}, function (result) {
+                realmeyeApiBrowser.get.player(ign, {condensed: condensed}, function (result) {
 
                     var string = JSON.stringify(result, null, 5);
                     $('textarea#results').val(string);
