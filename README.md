@@ -89,7 +89,7 @@ Same as GET but accepts the following POST parameters:
 
 ## Privacy Policy
 
-You can read more at the [Privacy Policy][privacy-policy.md] page.
+You can read more at the [Privacy Policy](privacy-policy.md) page.
 
 ## Jakcodex / Realmeye API License
 
