@@ -56,13 +56,24 @@ reapi.get.player('MyIGN', function(result) {
    curl http://localhost:3000/api/player/MyIGN
    ```
 
-#### API Reference - Available Endpoints
+#### REST API Reference - Available Endpoints
 
 ##### GET /api/player/:username
 Returns an object containing found player data for the specified user if any.
 
+##### POST /api/player/:username
+Same as GET but accepts the following POST parameters:
+
+1. `condensed` - Do not include full equipment and skin data
+
 ##### GET /api/class/:class[/:page]
 Returns an object containing the top players from the specified class. If a page number is provided it will be displayed instead of page 1.
+
+##### POST /api/class/:class[/:page]
+Same as GET but accepts the following POST parameters:
+
+1. `condensed` - Do not include full equipment and skin data
+1. `noPrivate` - Do not include private characters
 
 ##### GET /api/recentdeaths[/:page]
 Returns an object containing the most recent deaths in the game. If a page number is provided it will be displayed instead of page 1.
@@ -74,6 +85,11 @@ Same as GET but accepts the following POST parameters:
 1. `ms` - Maxed Stats (valid: 0, 1, 2, 3, 4, 5, 6, 7, 8)
 1. `page` - Specify a page number
 1. `noPrivate` - Do not include private characters
+1. `condensed` - Do not include full equipment and skin data
+
+## Privacy Policy
+
+You can read more at the [Privacy Policy][privacy-policy.md] page.
 
 ## Jakcodex / Realmeye API License
 

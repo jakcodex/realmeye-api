@@ -34,12 +34,12 @@
 
         textarea#results {
             width: 1000px;
-            height: 600px;
+            height: 500px;
         }
 
         textarea#code {
             width: 600px;
-            height: 200px;
+            height: 500px;
         }
 
         a {
@@ -52,13 +52,12 @@
 </head>
 <body>
 
-<h2>The examples have not been updated to support the latest version of 0.1. Soon!</h2>
+<h2>Jakcodex / Realmeye API</h2>
+Check out the Jakcodex / Realmeye API in action here! Lookup information and get sample code that shows what you're trying to do.
 
-This is a new project. Search tools will increase as development progresses.
-    
-<br><br>See <a href="https://jakcodex.github.io/realmeye-api/REQUIREMENTS" class="ignore" target="_blank">Requirements</a> before you get started.
+<br><br>This page uses the REST API service offered at <a href="https://reapi.jakcodex.io/" target="_blank">https://reapi.jakcodex.io/</a> to perform lookups.
 
-<br><br>Source code is available on <a href="https://github.com/jakcodex/realmeye-api" class="ignore" target="_blank">Github</a>.
+<br><br>See the project on <a href="https://github.com/jakcodex/realmeye-api" class="ignore" target="_blank">Github</a> for more information and source code. See the <a href="https://github.com/jakcodex/realmeye-api/blob/master/privacy-policy.md">Privacy Policy</a> for related info.
 
 <br><br><strong>Global Options</strong>
 
@@ -82,6 +81,7 @@ This is a new project. Search tools will increase as development progresses.
     <option>Priest</option>
     <option>Rogue</option>
     <option>Sorcerer</option>
+    <option>Samurai</option>
     <option>Trickster</option>
     <option>Warrior</option>
     <option>Wizard</option>
@@ -136,7 +136,7 @@ This is a new project. Search tools will increase as development progresses.
     <option value="9">901-1000</option>
 </select>
 <select name="realmeyeRecentDeathsBonuses">
-    <option value="0">Bonuses</option>
+    <option value="1">Bonuses</option>
     <option value="0">No</option>
     <option value="1">Yes</option>
 </select>
@@ -155,90 +155,183 @@ This is a new project. Search tools will increase as development progresses.
     </div>
 </div>
 
-<script src="vendor/jquery-3.2.1.min.js" language="javascript"></script>
-<script src="lib/realmeye-api.browser.js" language="javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" language="javascript"></script>
 <script language="JavaScript">
+
+    var apiUrl = 'https://reapi.jakcodex.io/api';
+    var result = $('textarea#results');
+    var code = $('textarea#code');
+
+    function done(data) {
+
+        var string = JSON.stringify(data, null, 5);
+        result.val(string);
+
+    }
+
+    function fail(xhr, err, errDesc) {
+
+        result.val('Error!');
+
+    }
 
     function react(e, target) {
 
         if ( e ) e.preventDefault();
+        var args;
+        var SampleArgs;
+        var ajaxOpts;
         var page = 0;
         var condensed = $('input[name="realmeyeCondensed"]').prop('checked');
         var noPrivate = $('input[name="realmeyeNoPrivate"]').prop('checked');
         if ( target === 'rerecentdeaths' ) {
 
-            var args = {
+            args = {
                 condensed: condensed,
                 noPrivate: noPrivate,
-                bonuses: ( $('select[name="realmeyeRecentDeathsBonuses"]').val() === "1" )
-            };
-            args.options = {
+                bonuses: ( $('select[name="realmeyeRecentDeathsBonuses"]').val() !== "0" ),
+                page: Number($('select[name="realmeyeRecentDeathsPage"]').val()),
                 bf: Number($('select[name="realmeyeRecentDeathsBF"]').val()),
                 ms: Number($('select[name="realmeyeRecentDeathsMS"]').val())
             };
 
-            page = $('select[name="realmeyeRecentDeathsPage"]').val();
-
-            //  don't include them if they are 0
-            for ( var i in args.options )
-                if ( args.options.hasOwnProperty(i) )
-                    if ( args.options[i] === 0 )
-                        delete args.options[i];
-
-            if ( Object.keys(args.options).length === 0 ) delete args.options;
-
-            var SampleArgs = $.extend(true, {}, args);
+            SampleArgs = $.extend(true, {}, args);
             if ( condensed === false ) delete SampleArgs.condensed;
             if ( noPrivate === false ) delete SampleArgs.noPrivate;
-            if ( args.bonuses === false ) delete SampleArgs.bonuses;
+            if ( args.bonuses === true ) delete SampleArgs.bonuses;
+            if ( args.page === 0 ) delete SampleArgs.page;
+            if ( args.bf === 0 ) delete SampleArgs.bf;
+            if ( args.ms === 0 ) delete SampleArgs.ms;
+
+            result.val('Running...');
+
+            ajaxOpts = {
+                url: apiUrl + '/recentdeaths',
+                method: 'GET'
+            };
+            if ( Object.keys(SampleArgs).length > 0 ) ajaxOpts = {
+                url: apiUrl + '/recentdeaths',
+                method: 'POST',
+                data: SampleArgs
+            };
+
+            $.ajax(ajaxOpts).done(done).fail(fail);
+
+            var value = '/*/  \n//   using ajax and the rest api\n/*/\n\
+$.ajax({\n\
+    url: \'' + ajaxOpts.url + '\',\n\
+    method: \'' + ajaxOpts.method + '\',\n\
+' + ( (ajaxOpts.method === 'POST') ? '    data: ' + JSON.stringify(SampleArgs) + '\n' : '' ) + '\
+}).done(function(data) {\n\
+\n\
+    //  response object is in data\n\
+\n\
+}).fail(function(xhr, err, errDesc) {\n\
+\n\
+    console.log(\'Error!\');\n\
+\n\
+});\n\
+\n';
+
+            delete SampleArgs.page;
             if ( typeof SampleArgs === 'object' ) SampleArgs = JSON.stringify(SampleArgs, null, 4);
+            value += '/*/  \n//   using nodejs module\n/*/\nconst reapi = require(\'lib/reapi.js\');\nreapi.get.list(\'recentdeaths\', ' + SampleArgs + ', ' + (args.page || 0) + ', function(result) { \n\t//  your code here \n});';
 
-            $('textarea#code').val('realmeyeapi.get.list(\'recentdeaths\', ' + SampleArgs + ', ' + page + ', function(result) { \n\t//  your code here \n});');
-
-            realmeyeApiBrowser.get.list('recentdeaths', args, page, function (result) {
-
-                var string = JSON.stringify(result, null, 5);
-                $('textarea#results').val(string);
-
-            });
+            code.val(value);
 
         } else if ( target === 'reclass' ) {
 
             var $class = $('select[name="realmeyeClass"]').val();
-            page = $('select[name="realmeyeClassPage"]').val();
+            page = Number($('select[name="realmeyeClassPage"]').val());
             if ( $class.length > 0 ) {
 
-                var args = {class: $class, condensed: condensed, noPrivate: noPrivate};
-                var SampleArgs = $.extend(true, {}, args);
-                if ( condensed === false ) delete SampleArgs.condensed;
-                if ( noPrivate === false ) delete SampleArgs.noPrivate;
-                if ( Object.keys(SampleArgs).length === 1 ) SampleArgs = '\'' + SampleArgs.class + '\'';
-                if ( typeof SampleArgs === 'object' ) SampleArgs = JSON.stringify(SampleArgs, null, 4);
-                $('textarea#code').val('realmeyeapi.get.list(\'class\', ' + SampleArgs + ', ' + page + ', function(result) { \n\t//  your code here \n});');
-                realmeyeApiBrowser.get.list('class', args, page, function (result) {
+                //class: $class,
+                args = {condensed: condensed, noPrivate: noPrivate};
+                SampleArgs = {};
+                console.log('t', condensed, noPrivate);
+                if ( condensed === true ) SampleArgs.condensed = true;
+                if ( noPrivate === true ) SampleArgs.noPrivate = true;
+                if ( Object.keys(SampleArgs).length === 0 ) SampleArgs = $class;
 
-                    var string = JSON.stringify(result, null, 5);
-                    $('textarea#results').val(string);
+                result.val('Running...');
 
-                });
+                ajaxOpts = {
+                    url: apiUrl + '/class' + '/' + $class.toLowerCase() + ( (page > 0) ? '/' + page : '' ),
+                    method: 'GET'
+                };
+                console.log('k', SampleArgs);
+                if ( typeof SampleArgs === 'object' && Object.keys(SampleArgs).length > 0 ) ajaxOpts = {
+                    url: apiUrl + '/class' + '/' + $class.toLowerCase() + ( (page > 0) ? '/' + page : '' ),
+                    method: 'POST',
+                    data: SampleArgs
+                };
 
-            } else $('textarea#results').val('Invalid player name provided');
+                $.ajax(ajaxOpts).done(done).fail(fail);
+
+                var value = '/*/  \n//   using ajax and the rest api\n/*/\n\
+$.ajax({\n\
+    url: \'' + ajaxOpts.url + '\',\n\
+    method: \'' + ajaxOpts.method + '\',\n\
+' + ( (ajaxOpts.method === 'POST') ? '    data: ' + JSON.stringify(SampleArgs) + '\n' : '' ) + '\
+}).done(function(data) {\n\
+\n\
+    //  response object is in data\n\
+\n\
+}).fail(function(xhr, err, errDesc) {\n\
+\n\
+    console.log(\'Error!\');\n\
+\n\
+});\n\
+\n';
+
+                if ( typeof SampleArgs === 'object' && Object.keys(SampleArgs).length > 0 && !SampleArgs.class ) SampleArgs.class = $class.toLowerCase();
+                SampleArgs = ( typeof SampleArgs === 'object' && Object.keys(SampleArgs).length > 0 ) ? JSON.stringify(SampleArgs, null, 4) : $class;
+                value += '/*/  \n//   using nodejs module\n/*/\nconst reapi = require(\'lib/reapi.js\');\nreapi.get.list(\'class\', ' + SampleArgs + ', ' + (args.page || 0) + ', function(result) { \n\t//  your code here \n});';
+
+                code.val(value);
+
+            } else result.val('Invalid player name provided');
 
         } else if ( target === 'replayer' ) {
 
             var ign = $('input[name="realmeyePlayer"]').val();
-            var SampleArgs = ( condensed === true ) ? '{condensed: ' + condensed + '}, ' : '';
-            $('textarea#code').val('realmeyeapi.get.player(\'' + ign + '\', ' + SampleArgs + 'function(result) { \n\t//  your code here \n});');
             if ( ign.length > 0 ) {
 
-                realmeyeApiBrowser.get.player(ign, {condensed: condensed}, function (result) {
+                result.val('Running...');
 
-                    var string = JSON.stringify(result, null, 5);
-                    $('textarea#results').val(string);
+                ajaxOpts = {
+                    url: apiUrl + '/player/' + ign,
+                    method: 'GET'
+                };
+                if ( condensed === true ) ajaxOpts = {
+                    url: apiUrl + '/player/' + ign,
+                    method: 'POST',
+                    data: {condensed: true}
+                };
 
-                });
+                $.ajax(ajaxOpts).done(done).fail(fail);
 
-            } else $('textarea#results').val('Invalid player name provided');
+                var value = '/*/  \n//   using ajax and the rest api\n/*/\n\
+$.ajax({\n\
+    url: \'' + ajaxOpts.url + '\',\n\
+    method: \'' + ajaxOpts.method + '\',\n\
+' + ( (ajaxOpts.method === 'POST') ? '    data: ' + JSON.stringify(ajaxOpts.data) + '\n' : '' ) + '\
+}).done(function(data) {\n\
+\n\
+    //  response object is in data\n\
+\n\
+}).fail(function(xhr, err, errDesc) {\n\
+\n\
+    console.log(\'Error!\');\n\
+\n\
+});\n\
+\n';
+
+                value += '/*/  \n//   using nodejs module\n/*/\nconst reapi = require(\'lib/reapi.js\');\nreapi.get.player(\'' + ign + '\', ' + ( (condensed === true) ? '{condensed: true}, ' : '' ) + 'function(result) { \n\t//  your code here \n});';
+
+                code.val(value);
+
+            } else result.val('Invalid player name provided');
 
         }
 

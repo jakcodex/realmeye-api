@@ -1,5 +1,12 @@
 # realmeye-api changelog
 
+**2018-08-20** v0.2.0
+
+- Redis caching implemented over all lookup request data
+- Cache updates obtain write locks and fallback on stale or inflight caches when failed
+- System logging facilities added
+- Added runtimeID for request tracing
+
 **2018-08-18** v0.1.0
 
 - Abandoned browser library due to CORS headaches
